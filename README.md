@@ -30,6 +30,7 @@
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
         <li><a href="#installation">Installation</a></li>
+        <li><a href="#run-app">Run App</a></li>
       </ul>
     </li>
     <li><a href="#contact">Contact</a></li>
