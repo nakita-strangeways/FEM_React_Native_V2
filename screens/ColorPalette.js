@@ -1,6 +1,6 @@
-import React from "react";
-import { StyleSheet, FlatList } from "react-native";
-import ColorBox from "../components/ColorBox";
+import React from 'react';
+import { StyleSheet, FlatList } from 'react-native';
+import ColorBox from '../components/ColorBox';
 
 const ColorPalette = ({ route }) => {
   const { colors, paletteName } = route.params;
@@ -18,13 +18,13 @@ const ColorPalette = ({ route }) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "white",
+    backgroundColor: 'white',
     paddingHorizontal: 10,
     paddingTop: 10,
   },
   text: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 10,
   },
 });

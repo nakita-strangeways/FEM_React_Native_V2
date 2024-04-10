@@ -9,11 +9,10 @@ import {
 import PalettePreview from '../components/PalettePreview';
 
 const Home = ({ navigation, route }) => {
+  const customPalette = route.params ? route.params.customPalette : null;
+
   const [colorPalletes, setColorPalletes] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
-
-  // const { newPalette } = route.params;
-  // console.log(newPalette);
 
   const handleFetchPalettes = useCallback(async () => {
     const result = await fetch(
@@ -39,6 +38,12 @@ const Home = ({ navigation, route }) => {
     handleFetchPalettes();
   }, []);
 
+  useEffect(() => {
+    if (customPalette) {
+      setColorPalletes((current) => [customPalette, ...current]);
+    }
+  }, [customPalette]);
+
   return (
     <FlatList
       refreshControl={
@@ -55,11 +60,12 @@ const Home = ({ navigation, route }) => {
       )}
       ListHeaderComponent={
         <TouchableOpacity
+          style={styles.button}
           onPress={() => {
             navigation.navigate('AddNewPalette');
           }}
         >
-          <Text style={styles.modalButton}>Add a Color Palette</Text>
+          <Text style={styles.buttonText}>Add a Color Palette</Text>
         </TouchableOpacity>
       }
     />
@@ -68,7 +74,17 @@ const Home = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
   list: { padding: 10, backgroundColor: 'white' },
-  modalButton: { color: 'blue' },
+  button: {
+    height: 40,
+    backgroundColor: 'teal',
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
 });
 
 export default Home;

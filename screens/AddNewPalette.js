@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   Alert,
   Button,
@@ -162,66 +162,69 @@ const COLORS = [
 
 const AddNewPalette = ({ navigation }) => {
   const [paletteName, setPaletteName] = useState('');
-  const [newPalette, setNewPalette] = useState([]);
+  const [selectedColors, setSelectedColors] = useState([]);
 
-  renderColorSelect = ({ item, index }) => {
-    const isSelected =
-      newPalette.filter((i) => {
-        return i === item.colorName;
-      }).length > 0; // checking if the item is already selected
+  const handleSubmit = useCallback(() => {
+    if (!paletteName) {
+      Alert.alert('Please add a name to your color palette');
+    } else if (selectedColors.length < 3) {
+      Alert.alert('Please choose at least 3 colors');
+    } else {
+      navigation.navigate('Home', {
+        customPalette: { paletteName: paletteName, colors: selectedColors },
+      });
+    }
+  }, [paletteName, selectedColors]);
 
-    return (
-      <View style={styles.options}>
-        <View>
-          <View style={[styles.box, { backgroundColor: item.hexCode }]} />
-        </View>
-        <Text>{item.colorName}</Text>
-        <Switch
-          style={styles.switch}
-          value={isSelected}
-          onValueChange={() => {
-            if (isSelected) {
-              setNewPalette((prev) => prev.filter((i) => i !== item.colorName));
-            } else {
-              setNewPalette((prev) => [...prev, item.colorName]);
-            }
-          }}
-        />
-      </View>
-    );
-  };
+  const handleUpdate = useCallback(
+    (color, newValue) => {
+      if (newValue === true) {
+        setSelectedColors((current) => [...current, color]);
+      } else {
+        setSelectedColors((current) =>
+          current.filter((c) => c.colorName !== color.colorName),
+        );
+      }
+    },
+    [selectedColors, setSelectedColors],
+  );
 
   return (
     <View style={[styles.container, { flex: 1 }]}>
       <Text style={styles.text}>Name your color palette:</Text>
       <TextInput
-        style={styles.input}
         onChangeText={setPaletteName}
+        placeholder="Palette Name"
+        style={styles.input}
         value={paletteName}
       />
       <FlatList
-        keyExtractor={(item) => item.colorName}
-        style={styles.list}
         data={COLORS}
-        renderItem={renderColorSelect}
+        keyExtractor={(item) => item.colorName}
+        renderItem={({ item }) => (
+          <View style={styles.options}>
+            <View>
+              <View style={[styles.box, { backgroundColor: item.hexCode }]} />
+            </View>
+            <Text>{item.colorName}</Text>
+            <Switch
+              style={styles.switch}
+              value={
+                !!selectedColors.find(
+                  (color) => color.colorName === item.colorName,
+                )
+              }
+              onValueChange={(newValue) => handleUpdate(item, newValue)}
+            />
+          </View>
+        )}
+        style={styles.list}
       />
-      <View style={styles.fixToText}>
+      <View>
         <Button
-          title="Back"
-          onPress={() => Alert.alert('Left button pressed')}
-        />
-        <Button
+          onPress={() => handleSubmit()}
+          style={styles.buttons}
           title="Submit"
-          onPress={() => {
-            if (paletteName === '') {
-              Alert.alert('Please name your palette');
-            } else if (newPalette.length <= 0) {
-              Alert.alert('No colors selected');
-            } else {
-              Alert.alert('Successful');
-              navigation.navigate('Home', newPalette);
-            }
-          }}
         />
       </View>
     </View>
@@ -239,6 +242,7 @@ const styles = StyleSheet.create({
     shadowRadius: 1,
     elevation: 2,
   },
+  buttons: { backgroundColor: 'teal' },
   container: {
     backgroundColor: 'white',
     paddingHorizontal: 10,
@@ -263,10 +267,6 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 13,
     marginBottom: 10,
-  },
-  fixToText: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
   },
 });
 
